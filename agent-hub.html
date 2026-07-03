@@ -226,7 +226,7 @@ async function seed(){
      models: [{id: 'mock-1', label: 'Mock model', inPrice: 0, outPrice: 0, ctx: 128000, tools: true}]},
   ];
   const agents = [
-    {id: 'agent-general', name: 'General Assistant', description: 'Default all-purpose assistant for everyday questions, drafting, and research.',
+    {id: 'agent-general', name: 'General Assistant', description: 'General-purpose fallback for drafting, writing, and everyday questions when no specialist agent fits.',
      systemPrompt: 'You are a capable, direct assistant. Be concise, structured, and concrete. Use European number formats (1.234,56) and DD.MM.YYYY dates in prose.',
      providerId: 'mock', modelId: 'mock-1', temperature: 0.7, skillIds: [], memoryAccess: 'readwrite'},
     {id: 'agent-compliance', name: 'Compliance Analyst', description: 'Regulatory and compliance analysis: EU financial regulation, CSSF, GDPR, DORA, AML, policy work.',
@@ -495,7 +495,8 @@ async function runTriage(text){
   const sysP = 'You are a task triage engine for an agent management system. Given a task and a catalog of agents, skills, and memories, ' +
     'respond with ONLY a JSON object: {"complexity":"low"|"medium"|"high","category":"<short label>","agent_id":"<best agent id>",' +
     '"skill_ids":["..."],"memory_ids":["..."],"clarification":"<question for the user if the task is ambiguous, else empty string>",' +
-    '"rationale":"<one sentence>"}. Only reference ids that exist in the catalog. Select only genuinely relevant skills and memories.';
+    '"rationale":"<one sentence>"}. Only reference ids that exist in the catalog. Select only genuinely relevant skills and memories. ' +
+    'Prefer the most specific agent whose scope covers the task; pick a general-purpose agent only when no specialist fits.';
   const userP = JSON.stringify({catalog, task: text});
   try {
     let out;
