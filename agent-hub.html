@@ -466,10 +466,14 @@ function heuristicTriage(text){
     .filter(sk => (sk.triggerKeywords || []).some(k => lc.includes(k.toLowerCase())))
     .map(sk => sk.id);
   const memoryIds = searchMemories(text).map(m => m.id);
+  const STOP = new Set(['the','and','for','with','that','this','what','how','are','was','will','can','you','our','not',
+    'about','from','into','after','week','today','latest','current','give','make','need','please']);
   let agent = null, best = 0;
   for (const a of S.data.agents){
-    const kw = (a.name + ' ' + a.description).toLowerCase().match(/[a-z0-9]{4,}/g) || [];
-    const s = kw.filter(w => words.has(w)).length;
+    const txt = (a.name + ' ' + a.description).toLowerCase();
+    /* substring match so "rates" hits "rate", "markets" hits "market", "EUR/USD" hits "eur" and "usd" */
+    let s = 0;
+    for (const w of words) if (w.length >= 3 && !STOP.has(w) && txt.includes(w)) s++;
     if (s > best){ best = s; agent = a; }
   }
   agent = agent || AG(S.data.settings.defaultAgentId) || S.data.agents[0] || null;
